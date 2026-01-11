@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Невидимые миры</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #e0e0e0;
+        }
+        
+        .container {
+            background: rgba(20, 20, 40, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(100, 100, 150, 0.2);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(100, 100, 150, 0.3);
+            padding-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 2.2em;
+            background: linear-gradient(45deg, #8a8aff, #ff8aff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(138, 138, 255, 0.3);
+        }
+        
+        .subtitle {
+            color: #aaa;
+            font-size: 1.1em;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        .audio-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .audio-btn {
+            padding: 18px 20px;
+            background: rgba(40, 40, 70, 0.7);
+            border: 1px solid rgba(100, 100, 150, 0.3);
+            border-radius: 10px;
+            font-size: 1.1em;
+            color: #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .audio-btn:hover {
+            background: rgba(60, 60, 100, 0.8);
+            border-color: rgba(138, 138, 255, 0.5);
+            transform: translateX(5px);
+            box-shadow: 0 0 15px rgba(138, 138, 255, 0.2);
+        }
+        
+        .audio-btn.active {
+            background: rgba(80, 80, 140, 0.9);
+            border-color: #8a8aff;
+            box-shadow: inset 0 0 20px rgba(138, 138, 255, 0.2);
+        }
+        
+        .btn-icon {
+            font-size: 1.3em;
+            opacity: 0.8;
+        }
+        
+        .player-section {
+            background: rgba(30, 30, 50, 0.9);
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 20px;
+            border: 1px solid rgba(100, 100, 150, 0.2);
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .now-playing {
+            margin-bottom: 20px;
+        }
+        
+        .track-title {
+            font-size: 1.3em;
+            color: #8a8aff;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .track-status {
+            font-size: 0.9em;
+            color: #aaa;
+            font-style: italic;
+        }
+        
+        audio {
+            width: 100%;
+            margin-top: 10px;
+            filter: sepia(0.2) hue-rotate(240deg);
+        }
+        
+        audio::-webkit-media-controls-panel {
+            background: rgba(40, 40, 70, 0.9);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        
+        .control-btn {
+            padding: 12px 25px;
+            background: rgba(60, 60, 100, 0.8);
+            border: 1px solid rgba(138, 138, 255, 0.3);
+            border-radius: 25px;
+            color: #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+        }
+        
+        .control-btn:hover {
+            background: rgba(80, 80, 140, 0.9);
+            border-color: #8a8aff;
+            transform: translateY(-2px);
+        }
+        
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .instructions {
+            margin-top: 25px;
+            padding: 15px;
+            background: rgba(40, 40, 70, 0.5);
+            border-radius: 8px;
+            border-left: 3px solid #8a8aff;
+            font-size: 0.9em;
+            color: #bbb;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #888;
+            font-size: 0.8em;
+            border-top: 1px solid rgba(100, 100, 150, 0.2);
+            padding-top: 20px;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px 20px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .audio-btn {
+                padding: 15px;
+                font-size: 1em;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Невидимые миры</h1>
+            <div class="subtitle">Аудио-размышления о границах и тишине</div>
+        </div>
+        
+        <div class="audio-options" id="audioOptions">
+            <button class="audio-btn" data-track="track1.ogg">
+                <span class="btn-icon">📡</span>
+                <span>Я говорю только в интернете</span>
+            </button>
+            
+            <button class="audio-btn" data-track="track2.ogg">
+                <span class="btn-icon">👁️</span>
+                <span>Меня не слушают</span>
+            </button>
+            
+            <button class="audio-btn" data-track="track3.ogg">
+                <span class="btn-icon">⚖️</span>
+                <span>Граница между шуткой и обидой</span>
+            </button>
+            
+            <button class="audio-btn" data-track="track4.ogg">
+                <span class="btn-icon">👻</span>
+                <span>Я невидимка</span>
+            </button>
+            
+            <button class="audio-btn" data-track="track5.ogg">
+                <span class="btn-icon">🌌</span>
+                <span>Я здесь чужая</span>
+            </button>
+        </div>
+        
+        <div class="player-section" id="playerSection">
+            <div class="now-playing">
+                <div class="track-title" id="currentTrack">Выберите трек</div>
+                <div class="track-status" id="statusText">Нажмите на одну из тем выше</div>
+            </div>
+            
+            <audio id="audioPlayer" controls preload="metadata">
+                Ваш браузер не поддерживает аудиоэлементы.
+            </audio>
+            
+            <div class="controls">
+                <button class="control-btn" id="playBtn">▶ Воспроизвести</button>
+                <button class="control-btn" id="pauseBtn" disabled>⏸ Пауза</button>
+                <button class="control-btn" id="stopBtn" disabled>⏹ Стоп</button>
+                <button class="control-btn" id="muteBtn">🔇 Выкл. звук</button>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            💡 Выберите тему для прослушивания. Аудиоплеер появится автоматически. 
+            Все файлы в формате .ogg — легкие и качественные.
+        </div>
+        
+        <div class="footer">
+            Создано для тех, кого не всегда слышно • Формат OGG для чистого звучания
+        </div>
+    </div>
+
+    <script>
+        // Элементы страницы
+        const audioPlayer = document.getElementById('audioPlayer');
+        const playerSection = document.getElementById('playerSection');
+        const currentTrack = document.getElementById('currentTrack');
+        const statusText = document.getElementById('statusText');
+        const playBtn = document.getElementById('playBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const muteBtn = document.getElementById('muteBtn');
+        
+        let isMuted = false;
+        let currentTrackName = '';
+        
+        // Обработка выбора трека
+        document.querySelectorAll('.audio-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // Снимаем выделение
+                document.querySelectorAll('.audio-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Выделяем текущую кнопку
+                this.classList.add('active');
+                
+                // Получаем данные
+                const trackFile = this.getAttribute('data-track');
+                const trackName = this.querySelector('span:nth-child(2)').textContent;
+                
+                // Обновляем информацию
+                currentTrackName = trackName;
+                currentTrack.textContent = `Сейчас: ${trackName}`;
+                statusText.textContent = 'Трек загружается...';
+                
+                // Устанавливаем аудио
+                audioPlayer.src = trackFile;
+                
+                // Показываем плеер
+                playerSection.style.display = 'block';
+                
+                // Включаем кнопки
+                playBtn.disabled = false;
+                pauseBtn.disabled = true;
+                stopBtn.disabled = true;
+                
+                // Автовоспроизведение (опционально)
+                // audioPlayer.play().catch(e => console.log("Автовоспроизведение заблокировано"));
+            });
+        });
+        
+        // Управление воспроизведением
+        playBtn.addEventListener('click', () => {
+            audioPlayer.play();
+            statusText.textContent = 'Воспроизведение...';
+            playBtn.disabled = true;
+            pauseBtn.disabled = false;
+            stopBtn.disabled = false;
+        });
+        
+        pauseBtn.addEventListener('click', () => {
+            audioPlayer.pause();
+            statusText.textContent = 'На паузе';
+            playBtn.disabled = false;
+            pauseBtn.disabled = true;
+        });
+        
+        stopBtn.addEventListener('click', () => {
+            audioPlayer.pause();
+            audioPlayer.currentTime = 0;
+            statusText.textContent = 'Остановлено';
+            playBtn.disabled = false;
+            pauseBtn.disabled = true;
+            stopBtn.disabled = true;
+        });
+        
+        muteBtn.addEventListener('click', () => {
+            isMuted = !isMuted;
+            audioPlayer.muted = isMuted;
+            muteBtn.textContent = isMuted ? '🔊 Вкл. звук' : '🔇 Выкл. звук';
+            statusText.textContent = isMuted ? 'Звук отключен' : 'Звук включен';
+            setTimeout(() => {
+                if (!audioPlayer.paused) {
+                    statusText.textContent = 'Воспроизведение...';
+                }
+            }, 1500);
+        });
+        
+        // События аудиоплеера
+        audioPlayer.addEventListener('play', () => {
+            statusText.textContent = 'Воспроизведение...';
+        });
+        
+        audioPlayer.addEventListener('pause', () => {
+            if (!audioPlayer.ended) {
+                statusText.textContent = 'На паузе';
+            }
+        });
+        
+        audioPlayer.addEventListener('ended', () => {
+            statusText.textContent = 'Трек завершен';
+            playBtn.disabled = false;
+            pauseBtn.disabled = true;
+            stopBtn.disabled = true;
+        });
+        
+        audioPlayer.addEventListener('timeupdate', () => {
+            const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+            if (!isNaN(progress)) {
+                statusText.textContent = `Играет: ${Math.round(progress)}%`;
+            }
+        });
+        
+        audioPlayer.addEventListener('error', () => {
+            statusText.textContent = 'Ошибка загрузки аудио';
+            playBtn.disabled = true;
+            pauseBtn.disabled = true;
+            stopBtn.disabled = true;
+        });
+        
+        // Информация о загрузке
+        audioPlayer.addEventListener('loadeddata', () => {
+            statusText.textContent = 'Готов к воспроизведению';
+            const duration = audioPlayer.duration;
+            if (duration && !isNaN(duration)) {
+                const mins = Math.floor(duration / 60);
+                const secs = Math.floor(duration % 60);
+                statusText.textContent += ` (${mins}:${secs.toString().padStart(2, '0')})`;
+            }
+        });
+    </script>
+</body>
+</html>
